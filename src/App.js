@@ -1,76 +1,44 @@
-// code for To Do List
-// function App() {
-  //   const [toDo, setToDo] = useState("")
-  //   const [toDos, setToDos] = useState([])
-  //   const onChange = (event) => setToDo(event.target.value)
-  //   const deleteBtn = index => {
-    //     setToDos(toDos.filter((item, todoIndex) => index !== todoIndex));
-    //   };
-    //   const onSubmit = (event) => {
-      //     event.preventDefault();
-      //     if(toDo === "") {
-        //       return;
-        //     }
-        //     setToDos(currentArray => [toDo, ...currentArray])
-        //     setToDo("")
-        //   }
-        //   return( 
-          //     <div>
-          //       <h1>My To Dos ({toDos.length})</h1>
-          //       <form onSubmit={onSubmit}>
-          //         <input onChange={onChange}  value={toDo}  type="text" placeholder="Write your to do..." />
-          //         <button>Add To Do</button>
-          //       </form>
-          //       <hr />
-//       <ul>
-//         {toDos.map((item, index) => 
-//           <li key={index}>
-//             {item}<button onClick={() => deleteBtn(index)}>❌</button>
-//           </li>
-//         )}
-//       </ul>
-//     </div>
-//   )
-// }
+import React from "react";
+import axios from "axios";
+import Movie from "./movie.js";
+import "./App.css";
 
-import { useEffect, useState } from "react";
-import styles from "./Bitcoin.module.css";
-
-function App() {
-  const [loading, setLoading] = useState(true)
-  const [coins, setCoins] = useState([])
-  const [bitcoin, setBitcoin] = useState(0)
-  const onChange = (event) => {
-    setBitcoin(event.target.value)
+class App extends React.Component {
+  state = {
+    isLoading: true,
+    movies: []
   }
-  useEffect(() => {
-    fetch("https://api.coinpaprika.com/v1/tickers").then(
-      (response) => response.json()).then(
-        (json) => {
-          setCoins(json);
-          setLoading(false);
-        })
-  }, [])
-  return(
-    <div>
-      <h1 className={styles.h1}>Your Bitcoin to USD</h1>
-      <div>
-        <label className={styles.label} htmlFor="Bitcoin">Write a Bitcoin sum you want</label>
-        <input className={styles.input} value={bitcoin} type="number" id="Bitcoin" placeholder="Write a Bitcoin sum you want." onChange={onChange}></input>
-      </div>
-      <div>
-        <p className={styles.p}>${Math.round(bitcoin*16668.3)} USD</p>
-      </div>
-      <div className={styles.Information}>
-        <h3>Information about Bitcoin</h3>
-        
-      </div>
-      <div className={styles.coins}>
-        <h3>Another coins ({coins.length} things)</h3>
-        <p>{coins.map((coin) => <option key={coin.id}>{coin.name} ({coin.symbol}): ${coin.quotes.USD.price} USD</option>)}</p>
-      </div>
-    </div> 
-  )
+  getMovies = async () => {
+    const {data : {data: {movies}}} = await axios.get("https://yts-proxy.nomadcoders1.now.sh/list_movies.json?sort_by=rating")
+    this.setState({movies, isLoading: false})
+  }
+  componentDidMount() {
+    this.getMovies()
+  }
+  render() {
+    const { isLoading, movies } = this.state;
+    return (
+      <section className="container">
+      {isLoading
+        ? <div className="loader">
+          <span className="loader__text">Loading...</span>
+        </div>
+        : (
+          <div className="movies">
+            {movies.map(movie => (
+              <Movie
+                key={movie.id}
+                year={movie.year}
+                title={movie.title}
+                summary={movie.summary}
+                poster={movie.medium_cover_image}
+                genres={movie.genres}
+              />
+            ))}
+        </div>
+        )}
+      </section>
+    );
+  }
 }
-
 export default App;
