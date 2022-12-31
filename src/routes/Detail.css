@@ -1,0 +1,18 @@
+.movie {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    width: 70%;
+    margin: 20px auto;
+    align-items: center;
+}
+
+.movie .movie-data {
+    padding: 0px 20px;
+}
+
+.movie .movie-data .moive__title {
+    margin: 0 0 10px 0;
+    font-size: 30px;
+}
